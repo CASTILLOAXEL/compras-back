@@ -33,12 +33,12 @@ class ProductoApiController extends AppBaseController implements HasMiddleware
     public function index(): JsonResponse
     {
         $productos = QueryBuilder::for(Producto::class)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 AllowedFilter::exact('tipo_producto_id'),
                 'nombre',
                 AllowedFilter::exact('estado'),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'id',
                 'tipo_producto_id',
                 'nombre',

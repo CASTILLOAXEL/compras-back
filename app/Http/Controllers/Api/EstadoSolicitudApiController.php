@@ -33,11 +33,11 @@ class EstadoSolicitudApiController extends AppBaseController implements HasMiddl
     public function index(): JsonResponse
     {
         $estadosSolicitud = QueryBuilder::for(EstadoSolicitud::class)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 'nombre',
                 AllowedFilter::exact('estado'),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'id',
                 'nombre',
                 'estado',

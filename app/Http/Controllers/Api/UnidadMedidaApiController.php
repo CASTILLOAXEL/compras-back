@@ -33,12 +33,12 @@ class UnidadMedidaApiController extends AppBaseController implements HasMiddlewa
     public function index(): JsonResponse
     {
         $unidadesMedida = QueryBuilder::for(UnidadMedida::class)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 'nombre',
                 'abreviatura',
                 AllowedFilter::exact('estado'),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'id',
                 'nombre',
                 'abreviatura',

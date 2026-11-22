@@ -45,4 +45,8 @@ class SolicitudDetalle extends Model
     {
         return $this->belongsTo(UnidadMedida::class, 'unidad_medida_id');
     }
+    protected function subtotal(): Attribute
+    {
+        return Attribute::get(fn () => round($this->cantidad * $this->precio_estimado, 2));
+    }
 }

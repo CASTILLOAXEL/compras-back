@@ -48,6 +48,8 @@ class DatabaseSeeder extends Seeder
             SolicitudPermisosSeeder::class,
             SolicitudDetallePermisosSeeder::class,
             // generar:crud permisos
+
+            RolSolicitantePermisosSeeder::class,
         ]);
     }
 }

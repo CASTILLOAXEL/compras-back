@@ -33,11 +33,11 @@ class TipoProductoApiController extends AppBaseController implements HasMiddlewa
     public function index(): JsonResponse
     {
         $tiposProducto = QueryBuilder::for(TipoProducto::class)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 'nombre',
                 AllowedFilter::exact('estado'),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'id',
                 'nombre',
                 'estado',

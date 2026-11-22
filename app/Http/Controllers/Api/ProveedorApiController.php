@@ -32,7 +32,7 @@ class ProveedorApiController extends AppBaseController implements HasMiddleware
     {
         $proveedores = QueryBuilder::for(Proveedor::class)
             ->with(self::RELACIONES)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 'razon_social',
                 'nit',
                 'dpi',
@@ -41,7 +41,7 @@ class ProveedorApiController extends AppBaseController implements HasMiddleware
                 'correo',
                 AllowedFilter::exact('estado'),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'id',
                 'razon_social',
                 'nit',

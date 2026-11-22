@@ -33,11 +33,11 @@ class PaisApiController extends AppBaseController implements HasMiddleware
     public function index(): JsonResponse
     {
         $paises = QueryBuilder::for(Pais::class)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 'nombre',
                 AllowedFilter::exact('estado'),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'id',
                 'nombre',
                 'estado',

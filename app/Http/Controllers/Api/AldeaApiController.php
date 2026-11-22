@@ -33,12 +33,12 @@ class AldeaApiController extends AppBaseController implements HasMiddleware
     public function index(): JsonResponse
     {
         $aldeas = QueryBuilder::for(Aldea::class)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 AllowedFilter::exact('municipio_id'),
                 'nombre',
                 AllowedFilter::exact('estado'),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'id',
                 'municipio_id',
                 'nombre',

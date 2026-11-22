@@ -5,18 +5,26 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\Api\CreateSolicitudDetalleApiRequest;
 use App\Http\Requests\Api\UpdateSolicitudDetalleApiRequest;
+use App\Models\EstadoSolicitud;
+use App\Models\Solicitud;
 use App\Models\SolicitudDetalle;
+use App\Models\Usuario;
+use App\Services\Services\SolicitudService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * CRUD de solicitud detalles. Cada acción exige su permiso en el token (abilities).
- */
 class SolicitudDetalleApiController extends AppBaseController implements HasMiddleware
 {
+    private const RELACIONES = ['producto', 'unidadMedida'];
+
+    public function __construct(private readonly SolicitudService $solicitudService)
+    {
+    }
+
     public static function middleware(): array
     {
         return [
@@ -27,74 +35,94 @@ class SolicitudDetalleApiController extends AppBaseController implements HasMidd
         ];
     }
 
-    /**
-     * GET api/solicitud_detalles?page[number]=1&page[size]=10&filter[campo]=valor&sort=-id
-     */
-    public function index(): JsonResponse
+
+    public function index(Request $request): JsonResponse
     {
-        $solicitudDetalles = QueryBuilder::for(SolicitudDetalle::class)
-            ->allowedFilters([
+        $detalles = QueryBuilder::for(SolicitudDetalle::class)
+            ->with(self::RELACIONES)
+            ->whereIn('solicitud_id', Solicitud::visiblesPara($request->user())->select('id'))
+            ->allowedFilters(...[
                 AllowedFilter::exact('solicitud_id'),
                 AllowedFilter::exact('producto_id'),
-                AllowedFilter::exact('unidad_medida_id'),
-                AllowedFilter::exact('cantidad'),
-                AllowedFilter::exact('precio_estimado'),
             ])
-            ->allowedSorts([
-                'id',
-                'solicitud_id',
-                'producto_id',
-                'unidad_medida_id',
-                'cantidad',
-                'precio_estimado',
-            ])
-            ->defaultSort('-id')
+            ->allowedSorts(...['id', 'cantidad', 'precio_estimado'])
+            ->defaultSort('id')
             ->jsonPaginate();
 
-        return $this->sendResponse($solicitudDetalles, 'Registros recuperados con éxito.');
+        $detalles->getCollection()->each->append('subtotal');
+
+        return $this->sendResponse($detalles, 'Ítems recuperados con éxito.');
     }
 
-    /**
-     * POST api/solicitud_detalles
-     */
+
     public function store(CreateSolicitudDetalleApiRequest $request): JsonResponse
     {
-        return $this->executeTransaction(function () use ($request) {
-            $solicitudDetalle = SolicitudDetalle::create($request->validated());
+        $solicitud = Solicitud::findOrFail($request->validated('solicitud_id'));
+        $this->verificarSolicitudEditable($solicitud, $request->user());
 
-            return $this->sendResponse($solicitudDetalle, 'Registro creado con éxito.');
+        return $this->executeTransaction(function () use ($request) {
+            $detalle = SolicitudDetalle::create($request->validated());
+
+            return $this->respuestaConRelaciones($detalle, 'Ítem agregado a la solicitud.');
         });
     }
 
-    /**
-     * GET api/solicitud_detalles/{id}
-     */
-    public function show(SolicitudDetalle $solicitudDetalle): JsonResponse
+
+    public function show(Request $request, SolicitudDetalle $solicitudDetalle): JsonResponse
     {
-        return $this->sendResponse($solicitudDetalle, 'Registro recuperado con éxito.');
+        $this->verificarAcceso($solicitudDetalle->solicitud, $request->user());
+
+        return $this->respuestaConRelaciones($solicitudDetalle, 'Ítem recuperado con éxito.');
     }
 
-    /**
-     * PUT/PATCH api/solicitud_detalles/{id}
-     */
+
     public function update(UpdateSolicitudDetalleApiRequest $request, SolicitudDetalle $solicitudDetalle): JsonResponse
     {
+        $this->verificarSolicitudEditable($solicitudDetalle->solicitud, $request->user());
+
         return $this->executeTransaction(function () use ($request, $solicitudDetalle) {
             $solicitudDetalle->update($request->validated());
 
-            return $this->sendResponse($solicitudDetalle, 'Registro actualizado con éxito.');
+            return $this->respuestaConRelaciones($solicitudDetalle, 'Ítem actualizado con éxito.');
         });
     }
 
-    /**
-     * DELETE api/solicitud_detalles/{id}  (soft delete)
-     */
-    public function destroy(SolicitudDetalle $solicitudDetalle): JsonResponse
+
+    public function destroy(Request $request, SolicitudDetalle $solicitudDetalle): JsonResponse
     {
+        $this->verificarSolicitudEditable($solicitudDetalle->solicitud, $request->user());
+
         return $this->executeOperation(function () use ($solicitudDetalle) {
             $solicitudDetalle->delete();
 
-            return $this->sendSuccess('Registro eliminado con éxito.');
+            return $this->sendSuccess('Ítem quitado de la solicitud.');
         });
+    }
+
+
+    private function verificarAcceso(Solicitud $solicitud, Usuario $usuario): void
+    {
+        $tieneAcceso = Solicitud::visiblesPara($usuario)->whereKey($solicitud->id)->exists();
+
+        abort_unless($tieneAcceso, 403, 'No tiene acceso a esta solicitud.');
+    }
+
+
+    private function verificarSolicitudEditable(Solicitud $solicitud, Usuario $usuario): void
+    {
+        $this->verificarAcceso($solicitud, $usuario);
+
+        $this->solicitudService->validarEstado(
+            $solicitud,
+            EstadoSolicitud::BORRADOR,
+            'Solo se pueden modificar los ítems de solicitudes en borrador.'
+        );
+    }
+
+    private function respuestaConRelaciones(SolicitudDetalle $detalle, string $mensaje): JsonResponse
+    {
+        $detalle->load(self::RELACIONES)->append('subtotal');
+
+        return $this->sendResponse($detalle, $mensaje);
     }
 }

@@ -33,12 +33,12 @@ class DireccionApiController extends AppBaseController implements HasMiddleware
     public function index(): JsonResponse
     {
         $direcciones = QueryBuilder::for(Direccion::class)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 AllowedFilter::exact('municipio_id'),
                 AllowedFilter::exact('aldea_id'),
                 'detalle',
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'id',
                 'municipio_id',
                 'aldea_id',

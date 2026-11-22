@@ -33,12 +33,12 @@ class CentroCostoApiController extends AppBaseController implements HasMiddlewar
     public function index(): JsonResponse
     {
         $centrosCosto = QueryBuilder::for(CentroCosto::class)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 'codigo',
                 'nombre',
                 AllowedFilter::exact('estado'),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'id',
                 'codigo',
                 'nombre',

@@ -8,7 +8,7 @@ use App\Http\Requests\Api\UpdateSolicitudApiRequest;
 use App\Models\EstadoSolicitud;
 use App\Models\Solicitud;
 use App\Models\Usuario;
-use App\Services\SolicitudService;
+use App\Services\Services\SolicitudService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -53,13 +53,13 @@ class SolicitudApiController extends AppBaseController implements HasMiddleware
     {
         $solicitudes = QueryBuilder::for(Solicitud::visiblesPara($request->user()))
             ->with(self::RELACIONES_LISTADO)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 'numero',
                 AllowedFilter::exact('centro_costo_id'),
                 AllowedFilter::exact('estado_solicitud_id'),
                 AllowedFilter::exact('solicitante_id'),
             ])
-            ->allowedSorts(['id', 'numero', 'fecha', 'estado_solicitud_id'])
+            ->allowedSorts(...['id', 'numero', 'fecha', 'estado_solicitud_id'])
             ->defaultSort('-id')
             ->jsonPaginate();
 

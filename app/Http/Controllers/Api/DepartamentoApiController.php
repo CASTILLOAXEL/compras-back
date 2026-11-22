@@ -33,12 +33,12 @@ class DepartamentoApiController extends AppBaseController implements HasMiddlewa
     public function index(): JsonResponse
     {
         $departamentos = QueryBuilder::for(Departamento::class)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 AllowedFilter::exact('pais_id'),
                 'nombre',
                 AllowedFilter::exact('estado'),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'id',
                 'pais_id',
                 'nombre',

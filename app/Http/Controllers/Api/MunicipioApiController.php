@@ -33,12 +33,12 @@ class MunicipioApiController extends AppBaseController implements HasMiddleware
     public function index(): JsonResponse
     {
         $municipios = QueryBuilder::for(Municipio::class)
-            ->allowedFilters([
+            ->allowedFilters(...[
                 AllowedFilter::exact('departamento_id'),
                 'nombre',
                 AllowedFilter::exact('estado'),
             ])
-            ->allowedSorts([
+            ->allowedSorts(...[
                 'id',
                 'departamento_id',
                 'nombre',
