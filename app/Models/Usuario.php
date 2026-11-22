@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
@@ -13,6 +14,7 @@ class Usuario extends Authenticatable
     use HasApiTokens, HasRoles, SoftDeletes;
 
     protected $table = 'usuarios';
+
 
     protected $guard_name = 'api';
 
@@ -52,8 +54,37 @@ class Usuario extends Authenticatable
         ])->filter()->implode(' '));
     }
 
+
+    public function direccion(): BelongsTo
+    {
+        return $this->belongsTo(Direccion::class, 'direccion_id');
+    }
+
     public function isSuperAdmin(): bool
     {
         return $this->hasRole(Role::SUPER_ADMINISTRADOR);
+    }
+
+
+    public function abilityRules(): array
+    {
+        return $this->getAllPermissions()
+            ->map(fn (Permission $permiso) => [
+                'action' => $permiso->name,
+                'subject' => $permiso->subject,
+            ])
+            ->values()
+            ->all();
+    }
+
+
+    public function userResponse(): array
+    {
+        return [
+            ...$this->toArray(),
+            'nombre_completo' => $this->nombre_completo,
+            'roles' => $this->getRoleNames(),
+            'abilityRules' => $this->abilityRules(),
+        ];
     }
 }

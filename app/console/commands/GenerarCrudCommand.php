@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
- * Genera el CRUD de una tabla al estilo Sysbase leyendo su esquema:
+ * Genera el CRUD de una tabla
  * modelo, controlador, requests de creación y edición, seeder de permisos y ruta.
  * Al final imprime el JSON que usa el generador del front (make:crud).
  *
- * Uso: php artisan generar:crud proveedores Proveedor
+ * El comando no sobrescribe archivos existentes a menos que el usuario confirme.
  */
 class GenerarCrudCommand extends Command
 {

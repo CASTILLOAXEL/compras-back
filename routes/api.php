@@ -1,13 +1,18 @@
 <?php
 
+use App\Http\Controllers\Api\Auth\AuthApiController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Rutas protegidas (requieren token de Sanctum)
-|--------------------------------------------------------------------------
-| generar:crud agrega aquí cada Route::apiResource. No borres la marca.
-*/
+
+Route::prefix('auth')->name('api.auth.')->group(function () {
+    // Rutas de autenticación
+    Route::post('login', [AuthApiController::class, 'login'])->middleware('throttle:5,1')->name('login');
+    Route::post('logout', [AuthApiController::class, 'logout'])->middleware('auth:sanctum')->name('logout');
+});
+
+Route::get('user', [AuthApiController::class, 'usuario'])->middleware('auth:sanctum')->name('api.user');
+
+// Rutas protegidas por autenticación
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('paises', App\Http\Controllers\Api\PaisApiController::class)->parameters(['paises' => 'pais']);
     Route::apiResource('departamentos', App\Http\Controllers\Api\DepartamentoApiController::class)->parameters(['departamentos' => 'departamento']);
