@@ -6,6 +6,7 @@ use App\Utils\ResponseUtil;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Throwable;
+use Illuminate\Validation\ValidationException;
 
 
 // Controlador base de la API: todas las respuestas salen con el formato { success, data, message }.
