@@ -57,7 +57,8 @@ class CreateSolicitudDetalleApiRequest extends FormRequest
                 Rule::exists('unidades_medida', 'id')->where('estado', true)->whereNull('deleted_at'),
             ],
             'cantidad' => ['required', 'numeric', 'gt:0', 'decimal:0,2', 'max:9999999999.99'],
-            'precio_estimado' => ['required', 'numeric', 'gt:0', 'decimal:0,2', 'max:99999999999.99'],
+            'precio_estimado' => ['required', 'numeric', 'min:0', 'decimal:0,2', 'max:99999999999.99'],
+
         ];
     }
 
