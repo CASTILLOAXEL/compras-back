@@ -11,6 +11,11 @@ class EstadoOrden extends Model
 
     protected $table = 'estados_orden';
 
+    // NUEVO: mismos ids que EstadoOrdenSeeder (Emitida = 1 ...)
+    public const EMITIDA = 1;
+    public const RECIBIDA = 2;
+    public const CANCELADA = 3;
+
     protected $fillable = [
         'nombre',
         'estado',

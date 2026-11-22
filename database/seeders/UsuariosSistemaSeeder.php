@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Role;
 use App\Models\Usuario;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 
 class UsuariosSistemaSeeder extends Seeder
@@ -17,7 +18,7 @@ class UsuariosSistemaSeeder extends Seeder
                 'dpi' => '1000000000101',
                 'primer_nombre' => 'Administrador',
                 'primer_apellido' => 'Sistema',
-                'password' => 'Gy202600',
+                'password' => Hash::make('Gy202600'),
             ]
         );
         $superAdministrador->assignRole(Role::SUPER_ADMINISTRADOR);
@@ -29,7 +30,8 @@ class UsuariosSistemaSeeder extends Seeder
                 'primer_nombre' => 'Ana',
                 'segundo_nombre' => 'María',
                 'primer_apellido' => 'López',
-                'password' => 'Gy202600',
+                'segundo_apellido' => 'González',
+                'password' => Hash::make('Gy202600'),
             ]
         );
         $solicitante->assignRole(Role::SOLICITANTE);
