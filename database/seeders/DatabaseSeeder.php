@@ -33,7 +33,6 @@ class DatabaseSeeder extends Seeder
             RolesPermisosBasicos::class,
             UsuariosSistemaSeeder::class,
 
-
             PaisPermisosSeeder::class,
             DepartamentoPermisosSeeder::class,
             MunicipioPermisosSeeder::class,
@@ -47,6 +46,10 @@ class DatabaseSeeder extends Seeder
             ProveedorPermisosSeeder::class,
             SolicitudPermisosSeeder::class,
             SolicitudDetallePermisosSeeder::class,
+            EstadoOrdenPermisosSeeder::class,
+            EstadoContratoPermisosSeeder::class,
+            ContratoPermisosSeeder::class,
+            OrdenPermisosSeeder::class,
             // generar:crud permisos
 
             RolSolicitantePermisosSeeder::class,

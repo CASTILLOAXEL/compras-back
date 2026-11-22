@@ -9,6 +9,10 @@ class EstadoOrdenSeeder extends Seeder
 {
     use InsertaConFechasTrait;
 
+    public const EMITIDA = 1;
+    public const RECIBIDA = 2;
+    public const CANCELADA = 3;
+
     public function run(): void
     {
         $this->insertarConFechas('estados_orden', [

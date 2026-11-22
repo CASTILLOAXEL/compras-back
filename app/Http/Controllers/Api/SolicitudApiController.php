@@ -17,7 +17,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
- * MODIFICADO: CRUD de solicitudes con su flujo de aprobación.
+ * CRUD de solicitudes con su flujo de aprobación.
  * Las reglas del negocio viven en SolicitudService.
  */
 class SolicitudApiController extends AppBaseController implements HasMiddleware
@@ -30,6 +30,7 @@ class SolicitudApiController extends AppBaseController implements HasMiddleware
         'detalles.unidadMedida',
         'historial.estadoSolicitud',
         'historial.usuario',
+        'orden.estadoOrden',
     ];
 
     public function __construct(private readonly SolicitudService $solicitudService)
@@ -43,11 +44,10 @@ class SolicitudApiController extends AppBaseController implements HasMiddleware
             new Middleware('abilities:crear solicitudes', only: ['store']),
             new Middleware('abilities:editar solicitudes', only: ['update']),
             new Middleware('abilities:eliminar solicitudes', only: ['destroy']),
-            new Middleware('abilities:enviar solicitudes', only: ['enviar']),              // NUEVO
-            new Middleware('abilities:aprobar solicitudes', only: ['aprobar', 'rechazar']), // NUEVO
+            new Middleware('abilities:enviar solicitudes', only: ['enviar']),
+            new Middleware('abilities:aprobar solicitudes', only: ['aprobar', 'rechazar']),
         ];
     }
-
 
     public function index(Request $request): JsonResponse
     {
@@ -75,13 +75,13 @@ class SolicitudApiController extends AppBaseController implements HasMiddleware
         });
     }
 
-
     public function show(Request $request, Solicitud $solicitud): JsonResponse
     {
         $this->verificarAcceso($solicitud, $request->user());
 
         return $this->respuestaConDetalle($solicitud, 'Solicitud recuperada con éxito.');
     }
+
     public function update(UpdateSolicitudApiRequest $request, Solicitud $solicitud): JsonResponse
     {
         $this->verificarAcceso($solicitud, $request->user());

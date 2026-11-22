@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Solicitud extends Model
@@ -48,6 +49,10 @@ class Solicitud extends Model
         return $this->belongsTo(EstadoSolicitud::class, 'estado_solicitud_id');
     }
 
+    public function orden(): HasOne
+    {
+        return $this->hasOne(Orden::class, 'solicitud_id', 'id');
+    }
 
     public function detalles(): HasMany
     {

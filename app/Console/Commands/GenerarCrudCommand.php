@@ -126,7 +126,8 @@ class GenerarCrudCommand extends Command
             File::ensureDirectoryExists(dirname($rutaDestino));
             File::put($rutaDestino, strtr($contenido, $reemplazos));
 
-            $this->line('  <fg=green>✔</> ' . Str::after($rutaDestino, base_path() . DIRECTORY_SEPARATOR));        }
+            $this->line('  <fg=green>✔</> ' . Str::after($rutaDestino, base_path() . DIRECTORY_SEPARATOR));
+        }
     }
 
     private function generarImportsModelo(): string
@@ -344,7 +345,8 @@ class GenerarCrudCommand extends Command
         $contenido = File::get($rutaArchivo);
         $seeder = "{$this->modelo}PermisosSeeder::class,";
 
-        if (str_contains($contenido, $seeder)) {
+
+        if (preg_match('/\b' . preg_quote($seeder, '/') . '/', $contenido)) {
             return;
         }
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthApiController;
+use App\Http\Controllers\Api\PaisApiController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -14,7 +15,7 @@ Route::get('user', [AuthApiController::class, 'usuario'])->middleware('auth:sanc
 
 // Rutas protegidas por autenticación
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('paises', App\Http\Controllers\Api\PaisApiController::class)->parameters(['paises' => 'pais']);
+    Route::apiResource('paises', PaisApiController::class)->parameters(['paises' => 'pais']);
     Route::apiResource('departamentos', App\Http\Controllers\Api\DepartamentoApiController::class)->parameters(['departamentos' => 'departamento']);
     Route::apiResource('municipios', App\Http\Controllers\Api\MunicipioApiController::class)->parameters(['municipios' => 'municipio']);
     Route::apiResource('aldeas', App\Http\Controllers\Api\AldeaApiController::class)->parameters(['aldeas' => 'aldea']);
@@ -27,15 +28,30 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('proveedores', App\Http\Controllers\Api\ProveedorApiController::class)->parameters(['proveedores' => 'proveedor']);
     Route::apiResource('solicitudes', App\Http\Controllers\Api\SolicitudApiController::class)->parameters(['solicitudes' => 'solicitud']);
     Route::apiResource('solicitud_detalles', App\Http\Controllers\Api\SolicitudDetalleApiController::class)->parameters(['solicitud_detalles' => 'solicitudDetalle']);
+    Route::apiResource('estados_orden', App\Http\Controllers\Api\EstadoOrdenApiController::class)->parameters(['estados_orden' => 'estadoOrden']);
+    Route::apiResource('estados_contrato', App\Http\Controllers\Api\EstadoContratoApiController::class)->parameters(['estados_contrato' => 'estadoContrato']);
+    Route::apiResource('contratos', App\Http\Controllers\Api\ContratoApiController::class)->parameters(['contratos' => 'contrato']);
+    // generar:crud rutas
 
     // Rutas para el flujo de aprobación de solicitudes
     Route::prefix('solicitudes/{solicitud}')->name('solicitudes.')->group(function () {
         Route::post('enviar', [App\Http\Controllers\Api\SolicitudApiController::class, 'enviar'])->name('enviar');
         Route::post('aprobar', [App\Http\Controllers\Api\SolicitudApiController::class, 'aprobar'])->name('aprobar');
         Route::post('rechazar', [App\Http\Controllers\Api\SolicitudApiController::class, 'rechazar'])->name('rechazar');
+
+        // Una solicitud aprobada genera su orden de compra
+        Route::post('orden', [App\Http\Controllers\Api\OrdenApiController::class, 'generarDesdeSolicitud'])->name('orden');
     });
 
+    // Órdenes de compra (no se crean ni editan directo: nacen de una solicitud y solo se cancelan)
+    Route::prefix('ordenes')->name('ordenes.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\OrdenApiController::class, 'index'])->name('index');
+        Route::get('{orden}', [App\Http\Controllers\Api\OrdenApiController::class, 'show'])->name('show');
+        Route::post('{orden}/cancelar', [App\Http\Controllers\Api\OrdenApiController::class, 'cancelar'])->name('cancelar');
+        Route::post('{orden}/recepciones', [App\Http\Controllers\Api\OrdenApiController::class, 'registrarRecepcion'])->name('recepciones'); // NUEVO
+    });
 
-
-
+    //  reporte e indicadores
+    Route::get('reportes/ordenes', [App\Http\Controllers\Api\ReporteApiController::class, 'ordenesPorProveedorYEstado'])->name('reportes.ordenes');
+    Route::get('inicio/indicadores', [App\Http\Controllers\Api\ReporteApiController::class, 'indicadoresInicio'])->name('inicio.indicadores');
 });

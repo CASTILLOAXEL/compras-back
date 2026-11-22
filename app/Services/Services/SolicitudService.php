@@ -47,6 +47,13 @@ class SolicitudService
         return $this->cambiarEstado($solicitud, EstadoSolicitud::APROBADA, $aprobador, $observacion ?? 'Solicitud aprobada.');
     }
 
+    public function completar(Solicitud $solicitud, Usuario $usuario, string $observacion): Solicitud
+    {
+        $this->validarEstado($solicitud, EstadoSolicitud::APROBADA, 'Solo una solicitud aprobada puede completarse.');
+
+        return $this->cambiarEstado($solicitud, EstadoSolicitud::COMPLETADA, $usuario, $observacion);
+    }
+
     public function rechazar(Solicitud $solicitud, Usuario $aprobador, string $motivo): Solicitud
     {
         $this->validarEstado($solicitud, EstadoSolicitud::EN_APROBACION, 'Solo se pueden rechazar solicitudes en aprobación.');
