@@ -7,11 +7,6 @@ use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\PermissionRegistrar;
 
-/**
- * Permisos del CRUD de solicitudes (generado con generar:crud).
- *
- * Para ejecutar: php artisan db:seed --class=SolicitudPermisosSeeder
- */
 class SolicitudPermisosSeeder extends Seeder
 {
     public function run(): void
@@ -23,6 +18,8 @@ class SolicitudPermisosSeeder extends Seeder
             'crear solicitudes',
             'editar solicitudes',
             'eliminar solicitudes',
+            'enviar solicitudes',
+            'aprobar solicitudes',
         ];
 
         foreach ($permisos as $permiso) {

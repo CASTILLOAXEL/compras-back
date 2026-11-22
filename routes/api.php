@@ -27,5 +27,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('proveedores', App\Http\Controllers\Api\ProveedorApiController::class)->parameters(['proveedores' => 'proveedor']);
     Route::apiResource('solicitudes', App\Http\Controllers\Api\SolicitudApiController::class)->parameters(['solicitudes' => 'solicitud']);
     Route::apiResource('solicitud_detalles', App\Http\Controllers\Api\SolicitudDetalleApiController::class)->parameters(['solicitud_detalles' => 'solicitudDetalle']);
-    // generar:crud rutas
+
+    // Rutas para el flujo de aprobación de solicitudes
+    Route::prefix('solicitudes/{solicitud}')->name('solicitudes.')->group(function () {
+        Route::post('enviar', [App\Http\Controllers\Api\SolicitudApiController::class, 'enviar'])->name('enviar');
+        Route::post('aprobar', [App\Http\Controllers\Api\SolicitudApiController::class, 'aprobar'])->name('aprobar');
+        Route::post('rechazar', [App\Http\Controllers\Api\SolicitudApiController::class, 'rechazar'])->name('rechazar');
+    });
+
+
+
+
 });

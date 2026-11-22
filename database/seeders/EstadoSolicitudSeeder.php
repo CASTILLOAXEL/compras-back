@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Traits\InsertaConFechasTrait;
 use Illuminate\Database\Seeder;
 
+
 class EstadoSolicitudSeeder extends Seeder
 {
     use InsertaConFechasTrait;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\Api\CreateProveedorApiRequest;
 use App\Http\Requests\Api\UpdateProveedorApiRequest;
+use App\Models\Direccion;
 use App\Models\Proveedor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -12,11 +13,11 @@ use Illuminate\Routing\Controllers\Middleware;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * CRUD de proveedores. Cada acción exige su permiso en el token (abilities).
- */
 class ProveedorApiController extends AppBaseController implements HasMiddleware
 {
+
+    private const RELACIONES = ['direccion.municipio.departamento', 'direccion.aldea'];
+
     public static function middleware(): array
     {
         return [
@@ -27,12 +28,10 @@ class ProveedorApiController extends AppBaseController implements HasMiddleware
         ];
     }
 
-    /**
-     * GET api/proveedores?page[number]=1&page[size]=10&filter[campo]=valor&sort=-id
-     */
     public function index(): JsonResponse
     {
         $proveedores = QueryBuilder::for(Proveedor::class)
+            ->with(self::RELACIONES)
             ->allowedFilters([
                 'razon_social',
                 'nit',
@@ -40,67 +39,59 @@ class ProveedorApiController extends AppBaseController implements HasMiddleware
                 'persona_contacto',
                 'telefono',
                 'correo',
-                AllowedFilter::exact('direccion_id'),
                 AllowedFilter::exact('estado'),
             ])
             ->allowedSorts([
                 'id',
                 'razon_social',
                 'nit',
-                'dpi',
                 'persona_contacto',
-                'telefono',
                 'correo',
-                'direccion_id',
                 'estado',
             ])
             ->defaultSort('-id')
             ->jsonPaginate();
 
-        return $this->sendResponse($proveedores, 'Registros recuperados con éxito.');
+        return $this->sendResponse($proveedores, 'Proveedores recuperados con éxito.');
     }
 
-    /**
-     * POST api/proveedores
-     */
     public function store(CreateProveedorApiRequest $request): JsonResponse
     {
         return $this->executeTransaction(function () use ($request) {
-            $proveedor = Proveedor::create($request->validated());
+            $direccion = Direccion::create($request->validated('direccion'));
 
-            return $this->sendResponse($proveedor, 'Registro creado con éxito.');
+            $proveedor = Proveedor::create([
+                ...$request->safe()->except('direccion'),
+                'direccion_id' => $direccion->id,
+            ]);
+
+            return $this->sendResponse($proveedor->load(self::RELACIONES), 'Proveedor creado con éxito.');
         });
     }
 
-    /**
-     * GET api/proveedores/{id}
-     */
+
     public function show(Proveedor $proveedor): JsonResponse
     {
-        return $this->sendResponse($proveedor, 'Registro recuperado con éxito.');
+        return $this->sendResponse($proveedor->load(self::RELACIONES), 'Proveedor recuperado con éxito.');
     }
 
-    /**
-     * PUT/PATCH api/proveedores/{id}
-     */
+
     public function update(UpdateProveedorApiRequest $request, Proveedor $proveedor): JsonResponse
     {
         return $this->executeTransaction(function () use ($request, $proveedor) {
-            $proveedor->update($request->validated());
+            $proveedor->direccion->update($request->validated('direccion'));
+            $proveedor->update($request->safe()->except('direccion'));
 
-            return $this->sendResponse($proveedor, 'Registro actualizado con éxito.');
+            return $this->sendResponse($proveedor->load(self::RELACIONES), 'Proveedor actualizado con éxito.');
         });
     }
 
-    /**
-     * DELETE api/proveedores/{id}  (soft delete)
-     */
     public function destroy(Proveedor $proveedor): JsonResponse
     {
         return $this->executeOperation(function () use ($proveedor) {
             $proveedor->delete();
 
-            return $this->sendSuccess('Registro eliminado con éxito.');
+            return $this->sendSuccess('Proveedor eliminado con éxito.');
         });
     }
 }

@@ -32,6 +32,8 @@ class AppBaseController extends Controller
     {
         try {
             return DB::transaction($operacion);
+        } catch (ValidationException $excepcion) {
+            throw $excepcion;
         } catch (Throwable $excepcion) {
             return $this->sendError(manejarException($excepcion), 500);
         }
@@ -44,8 +46,12 @@ class AppBaseController extends Controller
     {
         try {
             return $operacion();
+        } catch (ValidationException $excepcion) {
+            throw $excepcion;
         } catch (Throwable $excepcion) {
             return $this->sendError(manejarException($excepcion), 500);
         }
     }
+
+
 }

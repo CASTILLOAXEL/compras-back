@@ -9,6 +9,12 @@ class EstadoSolicitud extends Model
 {
     use SoftDeletes;
 
+     const BORRADOR = 1;
+     const EN_APROBACION = 2;
+     const APROBADA = 3;
+     const RECHAZADA = 4;
+     const COMPLETADA = 5;
+
     protected $table = 'estados_solicitud';
 
     protected $fillable = [
