@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class CentroCosto extends Model
+{
+    use SoftDeletes;
+
+    protected $table = 'centros_costo';
+
+    protected $fillable = [
+        'codigo',
+        'nombre',
+        'estado',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'estado' => 'boolean',
+        ];
+    }
+}

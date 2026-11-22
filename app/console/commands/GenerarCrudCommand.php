@@ -93,7 +93,7 @@ class GenerarCrudCommand extends Command
 
     private function generarArchivos(): void
     {
-        $this->info('📁 Archivos generados:');
+        $this->info(' Archivos generados:');
 
         $reemplazos = [
             '{{ modelo }}' => $this->modelo,
@@ -126,8 +126,7 @@ class GenerarCrudCommand extends Command
             File::ensureDirectoryExists(dirname($rutaDestino));
             File::put($rutaDestino, strtr($contenido, $reemplazos));
 
-            $this->line('  <fg=green>✔</> ' . Str::after($rutaDestino, base_path() . DIRECTORY_SEPARATOR));
-        }
+            $this->line('  <fg=green>✔</> ' . Str::after($rutaDestino, base_path() . DIRECTORY_SEPARATOR));        }
     }
 
     private function generarImportsModelo(): string
@@ -336,7 +335,7 @@ class GenerarCrudCommand extends Command
 
         File::put($rutaArchivo, str_replace(self::MARCA_RUTAS, $ruta . "\n    " . self::MARCA_RUTAS, $contenido));
 
-        $this->info("🌐 Ruta agregada: api/{$this->tabla}");
+        $this->info(" Ruta agregada: api/{$this->tabla}");
     }
 
     private function agregarSeederPermisos(): void
@@ -357,7 +356,7 @@ class GenerarCrudCommand extends Command
 
         File::put($rutaArchivo, str_replace(self::MARCA_SEEDERS, $seeder . "\n            " . self::MARCA_SEEDERS, $contenido));
 
-        $this->info("🔑 {$this->modelo}PermisosSeeder registrado en DatabaseSeeder");
+        $this->info(" {$this->modelo}PermisosSeeder registrado en DatabaseSeeder");
     }
 
 
@@ -373,7 +372,7 @@ class GenerarCrudCommand extends Command
         ];
 
         $this->newLine();
-        $this->info('📋 JSON para el generador del front (make:crud):');
+        $this->info(' JSON para el generador del front (make:crud):');
         $this->line(json_encode($datosFront, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 

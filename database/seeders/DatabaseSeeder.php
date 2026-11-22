@@ -6,12 +6,13 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-
+    /**
+     * Para ejecutar: php artisan migrate:fresh --seed
+     */
     public function run(): void
     {
-
         $this->call([
-            // Catálogos de geografía
+            // Ubicación
             PaisSeeder::class,
             DepartamentoSeeder::class,
             MunicipioSeeder::class,
@@ -31,6 +32,22 @@ class DatabaseSeeder extends Seeder
             // Seguridad
             RolesPermisosBasicos::class,
             UsuariosSistemaSeeder::class,
+
+
+            PaisPermisosSeeder::class,
+            DepartamentoPermisosSeeder::class,
+            MunicipioPermisosSeeder::class,
+            AldeaPermisosSeeder::class,
+            DireccionPermisosSeeder::class,
+            TipoProductoPermisosSeeder::class,
+            UnidadMedidaPermisosSeeder::class,
+            CentroCostoPermisosSeeder::class,
+            ProductoPermisosSeeder::class,
+            EstadoSolicitudPermisosSeeder::class,
+            ProveedorPermisosSeeder::class,
+            SolicitudPermisosSeeder::class,
+            SolicitudDetallePermisosSeeder::class,
+            // generar:crud permisos
         ]);
     }
 }
