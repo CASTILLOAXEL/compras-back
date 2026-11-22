@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+{{ importsModelo }}
+
+class {{ modelo }} extends Model
+{
+    {{ traitsModelo }}protected $table = '{{ tabla }}';
+
+    protected $fillable = [
+{{ fillable }}
+    ];
+
+    protected function casts(): array
+    {
+        return [
+{{ casts }}
+        ];
+    }
+{{ relaciones }}}

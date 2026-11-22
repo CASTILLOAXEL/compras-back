@@ -1,0 +1,87 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\AppBaseController;
+use App\Http\Requests\Api\Create{{ modelo }}ApiRequest;
+use App\Http\Requests\Api\Update{{ modelo }}ApiRequest;
+use App\Models\{{ modelo }};
+use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
+
+/**
+ * CRUD de {{ nombrePermiso }}. Cada acción exige su permiso en el token (abilities).
+ */
+class {{ modelo }}ApiController extends AppBaseController implements HasMiddleware
+{
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('abilities:ver {{ nombrePermiso }}', only: ['index', 'show']),
+            new Middleware('abilities:crear {{ nombrePermiso }}', only: ['store']),
+            new Middleware('abilities:editar {{ nombrePermiso }}', only: ['update']),
+            new Middleware('abilities:eliminar {{ nombrePermiso }}', only: ['destroy']),
+        ];
+    }
+
+    /**
+     * GET api/{{ tabla }}?page[number]=1&page[size]=10&filter[campo]=valor&sort=-id
+     */
+    public function index(): JsonResponse
+    {
+        ${{ variablePlural }} = QueryBuilder::for({{ modelo }}::class)
+            ->allowedFilters({{ filtros }})
+            ->allowedSorts({{ ordenamientos }})
+            ->defaultSort('-id')
+            ->jsonPaginate();
+
+        return $this->sendResponse(${{ variablePlural }}, 'Registros recuperados con éxito.');
+    }
+
+    /**
+     * POST api/{{ tabla }}
+     */
+    public function store(Create{{ modelo }}ApiRequest $request): JsonResponse
+    {
+        return $this->executeTransaction(function () use ($request) {
+            ${{ variable }} = {{ modelo }}::create($request->validated());
+
+            return $this->sendResponse(${{ variable }}, 'Registro creado con éxito.');
+        });
+    }
+
+    /**
+     * GET api/{{ tabla }}/{id}
+     */
+    public function show({{ modelo }} ${{ variable }}): JsonResponse
+    {
+        return $this->sendResponse(${{ variable }}, 'Registro recuperado con éxito.');
+    }
+
+    /**
+     * PUT/PATCH api/{{ tabla }}/{id}
+     */
+    public function update(Update{{ modelo }}ApiRequest $request, {{ modelo }} ${{ variable }}): JsonResponse
+    {
+        return $this->executeTransaction(function () use ($request, ${{ variable }}) {
+            ${{ variable }}->update($request->validated());
+
+            return $this->sendResponse(${{ variable }}, 'Registro actualizado con éxito.');
+        });
+    }
+
+    /**
+     * DELETE api/{{ tabla }}/{id}  (soft delete)
+     */
+    public function destroy({{ modelo }} ${{ variable }}): JsonResponse
+    {
+        return $this->executeOperation(function () use (${{ variable }}) {
+            ${{ variable }}->delete();
+
+            return $this->sendSuccess('Registro eliminado con éxito.');
+        });
+    }
+}
